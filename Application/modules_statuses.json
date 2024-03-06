@@ -1,0 +1,6 @@
+{
+    "User": true,
+    "Admin": true,
+    "Article": true,
+    "Dashboard": true
+}
