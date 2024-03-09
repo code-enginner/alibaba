@@ -135,6 +135,13 @@ return [
             'level' => env('LOG_LEVEL', 'debug'),
             'replace_placeholders' => true,
         ],
+
+        'article' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/article.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'replace_placeholders' => true,
+        ]
     ],
 
 ];

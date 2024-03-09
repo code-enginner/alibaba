@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Article\ArticleController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use Modules\Dashboard\App\Http\Controllers\DashboardController;
@@ -16,7 +17,7 @@ use Modules\Dashboard\App\Http\Controllers\DashboardController;
 */
 
 
-Route::get('/dashboard', [DashboardController::class, 'index'])
+Route::get('/dashboard', [ProfileController::class, 'dashboard'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
@@ -25,5 +26,9 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+Route::resource('article', ArticleController::class);
+
+
 
 require __DIR__ . '/auth.php';
