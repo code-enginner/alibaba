@@ -5,6 +5,14 @@
         </h2>
     </x-slot>
 
+    <div class="my-3 mx-5 text-center">
+        @if($errors->any())
+            @foreach($errors as $error)
+                <div class="my-3"><p class="p-5">{{ $error }}</p></div>
+            @endforeach
+        @endif
+    </div>
+
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
@@ -28,6 +36,7 @@
                             >Articles List</a
                             >
                         </li>
+
                         <li role="presentation">
                             <a
                                 href="#tabs-profile"

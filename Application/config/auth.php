@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use App\Models\Admin;
 
 return [
 
@@ -72,10 +73,10 @@ return [
             'model' => User::class,
         ],
 
-         'admin' => [
+         'admin' => array(
              'driver' => 'database',
-//             'table' => Admin,
-         ],
+             'model' => Admin::class
+         ),
     ],
 
     /*
