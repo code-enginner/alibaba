@@ -16,6 +16,9 @@ use Modules\Dashboard\App\Http\Controllers\DashboardController;
 |
 */
 
+Route::get('/', static function () {
+    return redirect()->route('dashboard');
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [ProfileController::class, 'dashboard'])->middleware('verified')->name('dashboard');

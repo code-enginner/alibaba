@@ -18,7 +18,7 @@
                     <tbody>
                     @if(count($articles) === 0)
                         <tr class="border-b border-neutral-200 dark:border-white/10">
-                            <td colspan="4"
+                            <td colspan="5"
                                 class="whitespace-nowrap px-6 py-4 font-medium text-center text-2xl text-[#f44336]">{{ __('!هیچ مقاله ای ثبت نشده') }}</td>
                         </tr>
 
