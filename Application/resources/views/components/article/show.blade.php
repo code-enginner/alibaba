@@ -7,32 +7,49 @@
                     <thead
                         class="border-b border-neutral-200 font-medium dark:border-white/10">
                     <tr>
-                        <th scope="col" class="px-6 py-4">#</th>
-                        <th scope="col" class="px-6 py-4">First</th>
-                        <th scope="col" class="px-6 py-4">Last</th>
-                        <th scope="col" class="px-6 py-4">Handle</th>
+                        <th scope="col" class="px-6 py-4 text-center">#</th>
+                        <th scope="col" class="px-6 py-4 text-center">Title</th>
+                        <th scope="col" class="px-6 py-4 text-center">Author</th>
+                        <th scope="col" class="px-6 py-4 text-center">Publish Date</th>
+                        <th scope="col" class="px-6 py-4 text-center">Settings</th>
                     </tr>
                     </thead>
 
                     <tbody>
-                    <tr class="border-b border-neutral-200 dark:border-white/10">
-                        <td class="whitespace-nowrap px-6 py-4 font-medium">1</td>
-                        <td class="whitespace-nowrap px-6 py-4">Mark</td>
-                        <td class="whitespace-nowrap px-6 py-4">Otto</td>
-                        <td class="whitespace-nowrap px-6 py-4">@mdo</td>
-                    </tr>
-                    <tr class="border-b border-neutral-200 dark:border-white/10">
-                        <td class="whitespace-nowrap px-6 py-4 font-medium">2</td>
-                        <td class="whitespace-nowrap px-6 py-4">Jacob</td>
-                        <td class="whitespace-nowrap px-6 py-4">Thornton</td>
-                        <td class="whitespace-nowrap px-6 py-4">@fat</td>
-                    </tr>
-                    <tr class="border-b border-neutral-200 dark:border-white/10">
-                        <td class="whitespace-nowrap px-6 py-4 font-medium">3</td>
-                        <td class="whitespace-nowrap px-6 py-4">Larry</td>
-                        <td class="whitespace-nowrap px-6 py-4">Wild</td>
-                        <td class="whitespace-nowrap px-6 py-4">@twitter</td>
-                    </tr>
+                    @if(count($articles) === 0)
+                        <tr class="border-b border-neutral-200 dark:border-white/10">
+                            <td colspan="4"
+                                class="whitespace-nowrap px-6 py-4 font-medium text-center text-2xl text-[#f44336]">{{ __('!هیچ مقاله ای ثبت نشده') }}</td>
+                        </tr>
+
+                    @else
+
+                        @foreach($articles as $article)
+                            <tr class="border-b border-neutral-200 dark:border-white/10">
+                                <td class="text-center whitespace-nowrap px-6 py-4 font-medium">{{ ++$loop->index }}</td>
+                                <td class="text-center whitespace-nowrap px-6 py-4">{{ $article->title }}</td>
+                                <td class="text-center whitespace-nowrap px-6 py-4">{{ $article->user->full_name }}</td>
+                                <td class="text-center whitespace-nowrap px-6 py-4">{{ $article->publish_date }}</td>
+                                <td class="text-center whitespace-nowrap px-6 py-4">
+                                    <a class="inline-block p-2 cursor-pointer mx-2 border bg-[#e1f5fe] border-[#03a9f4] rounded text-[#01579b]"
+                                       href="javascript:void(0)">مشاهده مقاله</a>
+
+                                    <a class="inline-block p-2 cursor-pointer mx-2 border bg-[#fffde7] border-[#fdd835] rounded text-[#f57f17]"
+                                       href="">ویرایش</a>
+
+                                    <form class="inline-block" action="{{ route('article.destroy', ['article' => $article->id]) }}" method="POST">
+                                        @csrf
+
+                                        <button type="submit" class="inline-block p-2 cursor-pointer mx-2 border bg-[#ffebee] border-[#f44336] rounded text-[#f44336]">حذف</button>
+                                    </form>
+
+                                </td>
+                            </tr>
+                        @endforeach
+
+                    @endif
+
+
                     </tbody>
                 </table>
             </div>

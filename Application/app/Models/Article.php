@@ -5,12 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Article extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
-    protected $fillable = ['user_id', 'title', 'content', 'publish_status', 'approve_status', 'approve_date', 'deleted_at'];
+    protected $fillable = ['user_id', 'title', 'content', 'publish_status', 'publish_date', 'approve_status', 'approve_date', 'deleted_at'];
+
+
 
     public function user(): BelongsTo
     {

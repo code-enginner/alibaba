@@ -3,18 +3,46 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\Article;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
-
     public function dashboard()
     {
-        return view('dashboard');
+        if (Auth::check()) {
+            $articles = [];
+            try {
+                $articles = Article::where('publish_status', TRUE)
+                    ->where('approve_status', TRUE)
+                    ->whereNull('deleted_at')
+                    ->with('user')
+                    ->orderBy('id', 'desc')
+//                    ->paginate(5);
+                    ->get();
+
+                Log::channel('article')->info('Load All Articles | Success', [
+                    'created_at' => Carbon::now()
+                ]);
+
+                return view('dashboard', compact('articles'));
+
+            } catch (\Exception $exception) {
+                Log::channel('article')->error('Load All Articles | Error', [
+                    'systemMessage' => $exception->getMessage(),
+                    'created_at'    => Carbon::now()
+                ]);
+
+//                $error = self::MESSAGES['error'][1];
+                return view('dashboard', compact('articles'));
+            }
+        }
     }
     /**
      * Display the user's profile form.
@@ -60,6 +88,6 @@ class ProfileController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return Redirect::to('/');
+        return Redirect::to('/login');
     }
 }

@@ -15,6 +15,19 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+
+                    <x-nav-link :href="route('profile.edit')">
+                        {{ __('Profile') }}
+                    </x-nav-link>
+
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+
+                        <button type="submit" class="mt-6 text-sm">
+                            {{ __('Log Out') }}
+                        </button>
+                    </form>
+
                 </div>
             </div>
 

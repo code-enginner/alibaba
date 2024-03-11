@@ -17,18 +17,15 @@ use Modules\Dashboard\App\Http\Controllers\DashboardController;
 */
 
 
-Route::get('/dashboard', [ProfileController::class, 'dashboard'])
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
-
 Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', [ProfileController::class, 'dashboard'])->middleware('verified')->name('dashboard');
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::resource('article', ArticleController::class);
 });
-
-Route::resource('article', ArticleController::class);
-
 
 
 require __DIR__ . '/auth.php';

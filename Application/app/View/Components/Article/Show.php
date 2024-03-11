@@ -9,13 +9,13 @@ use Illuminate\View\Component;
 
 class Show extends Component
 {
-    public Article $article;
+    public $articles;
     /**
      * Create a new component instance.
      */
-    public function __construct(Article $article)
+    public function __construct($articles)
     {
-        $this->article = $article;
+        $this->articles = $articles;
     }
 
     /**
