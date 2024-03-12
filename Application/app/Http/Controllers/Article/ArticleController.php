@@ -28,7 +28,8 @@ class ArticleController extends Controller
             'هیچ مقاله ای یافت نشد',
             'ویرایش این مقاله امکان پذیر نیست',
             'حذف این مقاله امکان پذیر نیست',
-            'شما مجوز لازم برای این کار را ندارید!'
+            'شما مجوز لازم برای این کار را ندارید!',
+            'عملایات امکان پذیر نیست'
         ],
     ];
 
@@ -92,32 +93,25 @@ class ArticleController extends Controller
      */
     public function show(string $id)
     {
-        if (Auth::check()) {
-            try {
-                //todo use model resource
-                $article = Article::where([
-                    ['publish_status', 1],
-                    ['approve_status', 1],
-                ])->whereNull('deleted_at')->firstOrFail();
+        try {
+            //todo use model resource
+            $article = Article::with('user')->find($id);
 
-                Log::channel('article')->info('Article Find | Success', [
-                    'result'     => $article,
-                    'modelId'    => $id,
-                    'created_at' => Carbon::now()
-                ]);
+            Log::channel('article')->info('Article Find | Success', [
+                'result'     => $article,
+                'modelId'    => $id,
+                'created_at' => Carbon::now()
+            ]);
 
-                return view('dashboard', compact('article'));
+            return view('components.article.show-by-id', compact('article'));
 
-            } catch (\Exception $exception) {
-                Log::channel('article')->error('Article Find | Error', [
-                    'systemMessage' => $exception->getMessage(),
-                    'modelId'       => $id,
-                    'created_at'    => Carbon::now()
-                ]);
-            }
+        } catch (\Exception $exception) {
+            Log::channel('article')->error('Article Find | Error', [
+                'systemMessage' => $exception->getMessage(),
+                'modelId'       => $id,
+                'created_at'    => Carbon::now()
+            ]);
         }
-
-        return redirect()->route('login');
     }
 
     /**
@@ -125,63 +119,56 @@ class ArticleController extends Controller
      */
     public function edit(string $id)
     {
-        if (Auth::check()) {
-            $article = Article::whereNull('deleted_at')->firstOrFail();
 
-            try {
-                if ($article->user()->id === $article->user_id) {
-                    Log::channel('article')->info('Article Find | Success', [
-                        'result'     => $article,
-                        'modelId'    => $id,
-                        'created_at' => Carbon::now()
-                    ]);
+        try {
+            $article = Article::whereNull('deleted_at')->with('user')->find($id);
 
-                    return view('dashboard', compact('article'));
-                }
-
-            } catch (\Exception $exception) {
-                Log::channel('article')->error('Article Find | Error', [
-                    'systemMessage' => $exception->getMessage(),
-                    'modelId'       => $id,
-                    'created_at'    => Carbon::now()
+            if ($this->authorize('update', $article)) {
+                Log::channel('article')->info('Article Find | Success', [
+                    'result'     => $article,
+                    'modelId'    => $id,
+                    'created_at' => Carbon::now()
                 ]);
 
-                return redirect()->back()->withErrors(self::MESSAGES['error'][2]);
+                return view('components.article.edit', compact('article'));
             }
-        }
 
-        return redirect()->route('login');
+        } catch (\Exception $exception) {
+            Log::channel('article')->error('Article Find | Error', [
+                'systemMessage' => $exception->getMessage(),
+                'article'       => $article,
+                'user'          => Auth::user(),
+                'created_at'    => Carbon::now()
+            ]);
+
+            return redirect()->back()->withErrors(self::MESSAGES['error'][2]);
+        }
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(ArticleRequest $request, string $id)
     {
-        //todo how should handel the fom validation
-        if (Auth::check()) {
-            try {
-                $article = Article::findOrFail($id);
-                $article->update($request->all());
+        try {
+            $article = Article::findOrFail($id);
+            $article->update($request->all());
 
-                Log::channel('article')->info('Article Update | Success', [
-                    'articleId'  => $id,
-                    'article'    => $article,
-                    'created_at' => Carbon::now()
-                ]);
+            Log::channel('article')->info('Article Update | Success', [
+                'articleId'  => $id,
+                'article'    => $article,
+                'created_at' => Carbon::now()
+            ]);
 
-                return redirect()->back()->with('success', self::MESSAGES['success'][3]);
+            return redirect()->back()->with('success', self::MESSAGES['success'][3]);
 
-            } catch (\Exception $exception) {
-                Log::channel('article')->error('Article Update | Error', [
-                    'systemMessage' => $exception->getMessage(),
-                    'articleId'     => $id,
-                    'created_at'    => Carbon::now()
-                ]);
-            }
+        } catch (\Exception $exception) {
+            Log::channel('article')->error('Article Update | Error', [
+                'systemMessage' => $exception->getMessage(),
+                'articleId'     => $id,
+                'created_at'    => Carbon::now()
+            ]);
         }
-
-        return redirect()->route('login');
     }
 
     /**
@@ -220,11 +207,12 @@ class ArticleController extends Controller
 
     public function approveArticle(Request $request, $id)
     {
-        if (Auth::guard('admin')->check()) {
+        if ($this->authorize('approve')) {
             try {
                 $article = Article::whereNull('deleted_at')->firstOrfail();
                 $article->approved_status = $request->only('approve_status');
                 $article->save();
+
                 Log::channel('article')->info('Article Approve | Success', [
                     'article'    => $article,
                     'articleId'  => $id,
@@ -239,7 +227,17 @@ class ArticleController extends Controller
                     'articleId'     => $id,
                     'created_at'    => Carbon::now()
                 ]);
+
+                return redirect()->route('dashboard')->withErrors(self::MESSAGES['error'][4]);
             }
+        } else {
+            Log::channel('article')->warning('Article Approve | Warning', [
+                'user'       => Auth::user(),
+                'articleId'  => $id,
+                'created_at' => Carbon::now()
+            ]);
+
+            return redirect()->route('dashboard')->withErrors(self::MESSAGES['error'][4]);
         }
     }
 }

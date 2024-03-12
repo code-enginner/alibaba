@@ -46,7 +46,7 @@ return [
 
         'admin' => [
             'driver' => 'session',
-            'provider' => 'admin',
+            'provider' => 'admins',
         ]
     ],
 
@@ -73,10 +73,10 @@ return [
             'model' => User::class,
         ],
 
-         'admin' => array(
-             'driver' => 'database',
+         'admins' => [
+             'driver' => 'eloquent',
              'model' => Admin::class
-         ),
+         ],
     ],
 
     /*
@@ -105,6 +105,13 @@ return [
             'expire' => 60,
             'throttle' => 60,
         ],
+
+        'admins' => [
+            'provider' => 'admins',
+            'table' => 'password_reset_tokens',
+            'expire' => 60,
+            'throttle' => 60,
+        ]
     ],
 
     /*

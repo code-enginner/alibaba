@@ -75,7 +75,7 @@
                             role="tabpanel"
                             aria-labelledby="tabs-profile-tab">
 
-                            <form action="{{ route('article.store') }}" method="post">
+                            <form action="{{ route('articles.store') }}" method="post">
                                 @csrf
 
                                 <div class="relative mb-3" data-twe-input-wrapper-init>

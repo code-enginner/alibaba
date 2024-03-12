@@ -27,7 +27,11 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::resource('article', ArticleController::class);
+    Route::resource('articles', ArticleController::class);
+});
+
+Route::middleware('auth:admin')->group(function () {
+    Route::post('approve/article', [ArticleController::class, 'approveArticle'])->name('approve.article');
 });
 
 

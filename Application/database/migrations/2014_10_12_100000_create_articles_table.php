@@ -16,9 +16,10 @@ return new class extends Migration
             $table->foreignId('user_id');
             $table->string('title');
             $table->string('content');
-            $table->string('publish_status');
-            $table->string('approve_status');
-            $table->string('approve_date');
+            $table->boolean('publish_status');
+            $table->dateTime('publish_date');
+            $table->boolean('approve_status')->default(0);
+            $table->dateTime('approve_date')->nullable()->default(NULL);
             $table->softDeletes();
             $table->timestamps();
         });

@@ -16,34 +16,32 @@ class ProfileController extends Controller
 {
     public function dashboard()
     {
-        if (Auth::check()) {
-            $articles = [];
-            try {
-                $articles = Article::where('publish_status', TRUE)
-                    ->where('approve_status', TRUE)
-                    ->whereNull('deleted_at')
-                    ->with('user')
-                    ->orderBy('id', 'desc')
+        $articles = [];
+        try {
+            $articles = Article::where('publish_status', TRUE)
+                ->where('approve_status', TRUE)
+                ->whereNull('deleted_at')
+                ->with('user')
+                ->orderBy('id', 'desc')
 //                    ->paginate(5);
-                    ->get();
+                ->get();
 
-                Log::channel('article')->info('Load All Articles | Success', [
-                    'created_at' => Carbon::now()
-                ]);
+            Log::channel('article')->info('Load All Articles | Success', [
+                'created_at' => Carbon::now()
+            ]);
 
-                return view('dashboard', compact('articles'));
+            return view('dashboard', compact('articles'));
 
-            } catch (\Exception $exception) {
-                Log::channel('article')->error('Load All Articles | Error', [
-                    'systemMessage' => $exception->getMessage(),
-                    'created_at'    => Carbon::now()
-                ]);
+        } catch (\Exception $exception) {
+            Log::channel('article')->error('Load All Articles | Error', [
+                'systemMessage' => $exception->getMessage(),
+                'created_at'    => Carbon::now()
+            ]);
 
-//                $error = self::MESSAGES['error'][1];
-                return view('dashboard', compact('articles'));
-            }
+            return view('dashboard', compact('articles'));
         }
     }
+
     /**
      * Display the user's profile form.
      */
@@ -62,7 +60,7 @@ class ProfileController extends Controller
         $request->user()->fill($request->validated());
 
         if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+            $request->user()->email_verified_at = NULL;
         }
 
         $request->user()->save();
