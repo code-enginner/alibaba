@@ -31,7 +31,8 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware('auth:admin')->group(function () {
-    Route::post('approve/article', [ArticleController::class, 'approveArticle'])->name('approve.article');
+    Route::post('article/approve/article', [ArticleController::class, 'approveArticle'])->name('article.approve.article');
+
 });
 
 

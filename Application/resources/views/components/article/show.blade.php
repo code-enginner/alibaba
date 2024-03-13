@@ -34,29 +34,24 @@
                                     <a class="inline-block p-2 cursor-pointer mx-2 border bg-[#e1f5fe] border-[#03a9f4] rounded text-[#01579b]"
                                        href="{{ route('articles.show', [$article->id]) }}">مشاهده مقاله</a>
 
-                                    @can('update', $article)
+
                                     <a class="inline-block p-2 cursor-pointer mx-2 border bg-[#fffde7] border-[#fdd835] rounded text-[#f57f17]"
                                        href="{{ url("articles/{$article->id}/edit") }}">ویرایش</a>
-                                    @endcan
 
-                                    @cannot('update', $article)
-                                        <a class="inline-block p-2 cursor-not-allowed mx-2 border bg-[#fafafa] border-[#424242] rounded text-[#424242]"
-                                           href="javascript:vid(0)">ویرایش</a>
-                                    @endcannot
-
-                                    @can('delete')
                                     <form class="inline-block" action="{{ route('articles.destroy', ['article' => $article->id]) }}" method="POST">
                                         @csrf
 
                                         <button type="submit" class="inline-block p-2 cursor-pointer mx-2 border bg-[#ffebee] border-[#f44336] rounded text-[#f44336]">حذف</button>
                                     </form>
-                                    @endcan
 
-                                    @cannot('delete')
-                                        <form class="inline-block" action="javascript:void(0)">
-                                            <button type="button" disabled class="inline-block p-2 cursor-not-allowed mx-2 border bg-[#fafafa] border-[#424242] rounded text-[#424242]">حذف</button>
-                                        </form>
-                                    @endcannot
+
+                                    <form class="inline-block" action="{{ route('article.approve.article') }}" method="POST">
+                                        @csrf
+                                        <input type="hidden" name="article" value="{{ $article->id }}">
+
+                                        <button type="submit" class="inline-block p-2 cursor-pointer mx-2 border bg-[#e8f5e9] border-[#4caf50] rounded text-[#4caf50]">تایید</button>
+                                    </form>
+
                                 </td>
                             </tr>
                         @endforeach

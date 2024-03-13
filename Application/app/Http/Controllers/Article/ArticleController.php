@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Article;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ArticleRequest;
 use App\Models\Article;
+use App\Providers\RouteServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -18,7 +19,7 @@ class ArticleController extends Controller
     private const MESSAGES = [
         'success' => [
             'مقاله با موفقیت ثبت شده',
-            'مقابله مورد نظر تایید شد',
+            'مقابله مورد نظر تغییر وضعیت یافت',
             'مقاله مورد نظر با موفقیت حذف شد',
             'یبه روز رسانی مقاله با موقیت انجام شد'
         ],
@@ -205,39 +206,31 @@ class ArticleController extends Controller
     }
 
 
-    public function approveArticle(Request $request, $id)
+    public function approveArticle(Request $request)
     {
-        if ($this->authorize('approve')) {
-            try {
-                $article = Article::whereNull('deleted_at')->firstOrfail();
-                $article->approved_status = $request->only('approve_status');
+        try {
+            $article = Article::where('id', $request->input('article'))->whereNull('deleted_at')->firstOrfail();
+
+            if ($this->authorize('approve', $article)) {
+                $article->approve_status = !((bool)$article->approve_status);
                 $article->save();
 
                 Log::channel('article')->info('Article Approve | Success', [
                     'article'    => $article,
-                    'articleId'  => $id,
                     'created_at' => Carbon::now()
                 ]);
 
-                return redirect()->back()->with('success', self::MESSAGES['success'][]);
-
-            } catch (\Exception $exception) {
-                Log::channel('article')->error('Article Approve | Error', [
-                    'systemMessage' => $exception->getMessage(),
-                    'articleId'     => $id,
-                    'created_at'    => Carbon::now()
-                ]);
-
-                return redirect()->route('dashboard')->withErrors(self::MESSAGES['error'][4]);
+                return redirect()->back()->with('success', self::MESSAGES['success'][1]);
             }
-        } else {
-            Log::channel('article')->warning('Article Approve | Warning', [
-                'user'       => Auth::user(),
-                'articleId'  => $id,
-                'created_at' => Carbon::now()
+
+        } catch (\Exception $exception) {
+            Log::channel('article')->error('Article Approve | Error', [
+                'systemMessage' => $exception->getMessage(),
+                'articleId'     => $request->input('article'),
+                'created_at'    => Carbon::now()
             ]);
 
-            return redirect()->route('dashboard')->withErrors(self::MESSAGES['error'][4]);
+            return redirect()->route('admin.dashboard')->withErrors(self::MESSAGES['error'][4]);
         }
     }
 }

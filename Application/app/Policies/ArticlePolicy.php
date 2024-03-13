@@ -38,17 +38,13 @@ class ArticlePolicy
      */
     public function update(User $user, Article $article): bool
     {
-//        if ((int)$user->id === (int)$article->user_id) {
-//            return TRUE;
-//        }
-//        return FALSE;
         return (int)$user->id === (int)$article->user_id;
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Article $article, Admin $admin): bool
+    public function delete(Admin $admin, Article $article): bool
     {
         return $admin->isAdmin();
     }
@@ -56,7 +52,7 @@ class ArticlePolicy
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, Article $article, Admin $admin): bool
+    public function restore(Admin $admin, Article $article): bool
     {
         return $admin->isAdmin();
     }
@@ -64,13 +60,13 @@ class ArticlePolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, Article $article, Admin $admin): bool
+    public function forceDelete(Admin $admin, Article $article): bool
     {
         return $admin->isAdmin();
     }
 
 
-    public function approve(User $user, Article $article, Admin $admin): bool
+    public function approve(Admin $admin, Article $article): bool
     {
         return $admin->isAdmin();
     }

@@ -25,6 +25,6 @@ class Admin extends Authenticatable
 
     public function isAdmin(): bool
     {
-        return (bool)Auth::guard('admin')->user();
+        return Auth::guard('admin')->check();
     }
 }
