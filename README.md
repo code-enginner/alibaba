@@ -7,7 +7,7 @@ In this sample project, I use postgres as a database but you can change database
 
 After cloning the project just run the below command:
 ```sh
-php artisna app:init
+php artisan app:init
 ```
 
 This command prepares the application for use. run composer install and npm install, run databse migration for you and seed the database with some mocke data.
