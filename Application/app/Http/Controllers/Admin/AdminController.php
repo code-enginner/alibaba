@@ -12,7 +12,7 @@ class AdminController extends Controller
 
     public function dashboard()
     {
-        $articles = Article::with('user')->get();
+        $articles = Article::with('user')->withTrashed()->get();
 
         return view('profile.admin-profile.dashboard', compact('articles'));
     }

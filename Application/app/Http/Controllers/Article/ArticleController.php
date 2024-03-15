@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\ArticleRequest;
 use App\Models\Article;
 use App\Providers\RouteServiceProvider;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -19,9 +20,10 @@ class ArticleController extends Controller
     private const MESSAGES = [
         'success' => [
             'مقاله با موفقیت ثبت شده',
-            'مقابله مورد نظر تغییر وضعیت یافت',
+            'مقاله مورد نظر، تغییر وضعیت یافت',
             'مقاله مورد نظر با موفقیت حذف شد',
-            'یبه روز رسانی مقاله با موقیت انجام شد'
+            'به روز رسانی مقاله با موفقیت انجام شد',
+            'مقاله با موفقیت بازیابی شد'
         ],
 
         'error' => [
@@ -30,7 +32,8 @@ class ArticleController extends Controller
             'ویرایش این مقاله امکان پذیر نیست',
             'حذف این مقاله امکان پذیر نیست',
             'شما مجوز لازم برای این کار را ندارید!',
-            'عملایات امکان پذیر نیست'
+            'عملیات امکان پذیر نیست',
+            'بازیابی ناموفق بود'
         ],
     ];
 
@@ -71,7 +74,7 @@ class ArticleController extends Controller
                 Log::channel('article')->info('Article Register | Success', [
                     'userInputs' => $request->all(),
                     'article'    => $article,
-                    'created_at' => Carbon::now()
+                    'created_at' => Carbon::now(),
                 ]);
 
                 return redirect()->back()->with('success', self::MESSAGES['success'][0]);
@@ -80,7 +83,7 @@ class ArticleController extends Controller
                 Log::channel('article')->error('Article Register | Error', [
                     'userInputs'  => $request->all(),
                     'sysMessages' => $exception->getMessage(),
-                    'created-at'  => Carbon::now()
+                    'created-at'  => Carbon::now(),
                 ]);
             }
         }
@@ -101,7 +104,7 @@ class ArticleController extends Controller
             Log::channel('article')->info('Article Find | Success', [
                 'result'     => $article,
                 'modelId'    => $id,
-                'created_at' => Carbon::now()
+                'created_at' => Carbon::now(),
             ]);
 
             return view('components.article.show-by-id', compact('article'));
@@ -110,7 +113,7 @@ class ArticleController extends Controller
             Log::channel('article')->error('Article Find | Error', [
                 'systemMessage' => $exception->getMessage(),
                 'modelId'       => $id,
-                'created_at'    => Carbon::now()
+                'created_at'    => Carbon::now(),
             ]);
         }
     }
@@ -120,7 +123,6 @@ class ArticleController extends Controller
      */
     public function edit(string $id)
     {
-
         try {
             $article = Article::whereNull('deleted_at')->with('user')->find($id);
 
@@ -128,7 +130,7 @@ class ArticleController extends Controller
                 Log::channel('article')->info('Article Find | Success', [
                     'result'     => $article,
                     'modelId'    => $id,
-                    'created_at' => Carbon::now()
+                    'created_at' => Carbon::now(),
                 ]);
 
                 return view('components.article.edit', compact('article'));
@@ -139,7 +141,7 @@ class ArticleController extends Controller
                 'systemMessage' => $exception->getMessage(),
                 'article'       => $article,
                 'user'          => Auth::user(),
-                'created_at'    => Carbon::now()
+                'created_at'    => Carbon::now(),
             ]);
 
             return redirect()->back()->withErrors(self::MESSAGES['error'][2]);
@@ -151,14 +153,20 @@ class ArticleController extends Controller
      */
     public function update(ArticleRequest $request, string $id)
     {
+        $updateData = [
+            'title' => $request->input('title'),
+            'content' => $request->input('content'),
+            'publish_status' => isset($request->publish),
+        ];
+
         try {
             $article = Article::findOrFail($id);
-            $article->update($request->all());
+            $article->update($updateData);
 
             Log::channel('article')->info('Article Update | Success', [
                 'articleId'  => $id,
                 'article'    => $article,
-                'created_at' => Carbon::now()
+                'created_at' => Carbon::now(),
             ]);
 
             return redirect()->back()->with('success', self::MESSAGES['success'][3]);
@@ -167,7 +175,7 @@ class ArticleController extends Controller
             Log::channel('article')->error('Article Update | Error', [
                 'systemMessage' => $exception->getMessage(),
                 'articleId'     => $id,
-                'created_at'    => Carbon::now()
+                'created_at'    => Carbon::now(),
             ]);
         }
     }
@@ -177,32 +185,7 @@ class ArticleController extends Controller
      */
     public function destroy(string $id)
     {
-        if (Auth::guard('admin')->check()) {
-            try {
-                $article = Article::findOrFail($id);
-                $article->delete();
-
-                return redirect()->back()->with('success', self::MESSAGES['success'][2]);
-
-            } catch (\Exception $exception) {
-                Log::channel('article')->error('Article Delete | Error', [
-                    'articleId'     => $id,
-                    'systemMessage' => $exception->getMessage(),
-                    'created_at'    => Carbon::now()
-                ]);
-
-                return redirect()->back()->withErrors(self::MESSAGES['error'][3]);
-            }
-        }
-
-        Log::channel('article')->alert('Article Delete | Alert', [
-            'articleId'     => $id,
-            'systemMessage' => self::MESSAGES['error'][4],
-            'user'          => Auth::user(),
-            'created_at'    => Carbon::now()
-        ]);
-
-        return redirect()->back()->withErrors(self::MESSAGES['error'][4]);
+        //
     }
 
 
@@ -217,7 +200,7 @@ class ArticleController extends Controller
 
                 Log::channel('article')->info('Article Approve | Success', [
                     'article'    => $article,
-                    'created_at' => Carbon::now()
+                    'created_at' => Carbon::now(),
                 ]);
 
                 return redirect()->back()->with('success', self::MESSAGES['success'][1]);
@@ -227,10 +210,70 @@ class ArticleController extends Controller
             Log::channel('article')->error('Article Approve | Error', [
                 'systemMessage' => $exception->getMessage(),
                 'articleId'     => $request->input('article'),
-                'created_at'    => Carbon::now()
+                'created_at'    => Carbon::now(),
             ]);
 
             return redirect()->route('admin.dashboard')->withErrors(self::MESSAGES['error'][4]);
         }
+    }
+
+    public function deleteArticle(string $id)
+    {
+        if (Auth::guard('admin')->check()) {
+            try {
+                $article = Article::findOrFail($id);
+                $article->delete();
+
+                return redirect()->back()->with('success', self::MESSAGES['success'][2]);
+
+            } catch (\Exception $exception) {
+                Log::channel('article')->error('Article Delete | Error', [
+                    'articleId'     => $id,
+                    'systemMessage' => $exception->getMessage(),
+                    'created_at'    => Carbon::now(),
+                ]);
+
+                return redirect()->back()->withErrors(self::MESSAGES['error'][3]);
+            }
+        }
+
+        Log::channel('article')->alert('Article Delete | Alert', [
+            'articleId'     => $id,
+            'systemMessage' => self::MESSAGES['error'][4],
+            'user'          => Auth::user(),
+            'created_at'    => Carbon::now(),
+        ]);
+
+        return redirect()->back()->withErrors(self::MESSAGES['error'][4]);
+    }
+
+    public function restoreArticle(string $id): RedirectResponse
+    {
+        if (Auth::guard('admin')->check()) {
+            try {
+                $article = Article::withTrashed($id);
+                $article->restore();
+
+                return redirect()->back()->with('success', self::MESSAGES['success'][4]);
+
+            } catch (\Exception $exception) {
+                Log::channel('article')->error('Article Restore | Success', [
+                    'articleId'     => $id,
+                    'systemMessage' => $exception->getMessage(),
+                    'created_at'    => Carbon::now(),
+                ]);
+
+                return redirect()->back()->withErrors(self::MESSAGES['error'][6]);
+            }
+        }
+
+        Log::channel('article')->alert('Article Restore | Alert', [
+            'articleId'     => $id,
+            'systemMessage' => self::MESSAGES['error'][4],
+            'user'          => Auth::user(),
+            'created_at'    => Carbon::now(),
+        ]);
+
+        return redirect()->back()->withErrors(self::MESSAGES['error'][4]);
     }
 }

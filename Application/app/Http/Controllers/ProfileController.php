@@ -19,11 +19,8 @@ class ProfileController extends Controller
         $articles = [];
         try {
             $articles = Article::where('publish_status', TRUE)
-                ->where('approve_status', TRUE)
-                ->whereNull('deleted_at')
-                ->with('user')
+                ->where('approve_status', TRUE)->with('user')
                 ->orderBy('id', 'desc')
-//                    ->paginate(5);
                 ->get();
 
             Log::channel('article')->info('Load All Articles | Success', [
