@@ -1,7 +1,7 @@
 # Alibaba Task
 
 
-In this sample project, I use postgres as a database but you can change database as you preferred. remember that you should change database config in .env file and database.php in config directory and also create database.
+In this sample project, I use postgres as a database but you can change database as you preferred. remember that you should change database config in __.env__ file and __database.php__ in config directory and also create database.
 
 ## Installation
 
