@@ -16,7 +16,7 @@ For user validation, I have used the _Laravel/Breeze_ package. Use the following
 ```sh
 admin/login
 ```
-After seeding database, enter the following information to log in:
+After seeding database, enter the following information to log in as admin:
 ```sh
 admin@admin.com
 11111111
