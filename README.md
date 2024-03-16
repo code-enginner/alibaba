@@ -10,7 +10,7 @@ After cloning the project just run the below command:
 php artisan app:init
 ```
 
-This command prepares the application for use. run composer install and npm install, run databse migration for you and seed the database with some mocke data.
+This command prepares the application for use. run composer install and npm install, run database migration for you and seed the database with some mocke data.
 
 For user validation, I have used the _Laravel/Breeze_ package. Use the following route to access the admin panel:
 ```sh
